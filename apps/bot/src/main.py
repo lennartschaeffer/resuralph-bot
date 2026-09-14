@@ -5,13 +5,13 @@ from mangum import Mangum
 from asgiref.wsgi import WsgiToAsgi
 from discord_interactions import verify_key_decorator
 from dotenv import load_dotenv
-from commands.upload import handle_upload_command
-from commands.get_latest_resume import handle_get_latest_resume_command
-from commands.get_all_resumes import handle_get_all_resumes_command
-from commands.ai_review import handle_ai_review_command
-from helpers.sqs_publisher import publish_command_to_queue, create_deferred_response
-from helpers.embed_helper import create_error_embed
-from helpers.local_async_processor import handle_async_command_local
+from apps.bot.src.commands.upload import handle_upload_command
+from apps.bot.src.commands.get_latest_resume import handle_get_latest_resume_command
+from apps.bot.src.commands.get_all_resumes import handle_get_all_resumes_command
+from apps.bot.src.commands.ai_review import handle_ai_review_command
+from apps.bot.src.helpers.sqs_publisher import publish_command_to_queue, create_deferred_response
+from apps.bot.src.helpers.embed_helper import create_error_embed
+from apps.bot.src.helpers.local_async_processor import handle_async_command_local
 
 logging.basicConfig(
     level=logging.INFO,
@@ -66,10 +66,9 @@ def interact(raw_request):
 
 def handle_command_routing(command_name, raw_request):
     
-    async_commands = set(["update", "clear_resumes", "get_all_resumes", "upload"])
+    async_commands = set(["update", "clear_resumes", "get_all_resumes", "upload", "get_latest_resume"])
     
     sync_command_handlers = {
-        "get_latest_resume": handle_get_latest_resume_command,
         "ai_review": handle_ai_review_command
     }
     
@@ -100,7 +99,7 @@ def handle_command_routing(command_name, raw_request):
 
 def format_command_response(command_name, response_content):
     # Async commands return deferred responses that are already formatted
-    async_commands = set(["update", "clear_resumes", "get_all_resumes", "upload"])
+    async_commands = set(["update", "clear_resumes", "get_all_resumes", "upload", "get_latest_resume"])
     if command_name in async_commands:
         return response_content # deferred response already handled in async processing
 

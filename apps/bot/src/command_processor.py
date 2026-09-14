@@ -1,7 +1,7 @@
 import json
 import logging
 from typing import Dict, Any, List
-from helpers.discord_followup import send_followup_message
+from apps.bot.src.helpers.discord_followup import send_followup_message
 
 logging.basicConfig(
     level=logging.INFO,
@@ -86,17 +86,20 @@ def process_command(interaction_data: Dict[str, Any], command_type: str) -> Any:
     """
     try:
         if command_type == 'update':
-            from commands.update import handle_update_command
+            from apps.bot.src.commands.update import handle_update_command
             return handle_update_command(interaction_data)
         elif command_type == 'clear_resumes':
-            from commands.clear_resumes import handle_clear_resumes_command
+            from apps.bot.src.commands.clear_resumes import handle_clear_resumes_command
             return handle_clear_resumes_command(interaction_data)
         elif command_type == 'get_all_resumes':
-            from commands.get_all_resumes import handle_get_all_resumes_command
+            from apps.bot.src.commands.get_all_resumes import handle_get_all_resumes_command
             return handle_get_all_resumes_command(interaction_data)
         elif command_type == 'upload':
-            from commands.upload import handle_upload_command
+            from apps.bot.src.commands.upload import handle_upload_command
             return handle_upload_command(interaction_data)
+        elif command_type == 'get_latest_resume':
+            from apps.bot.src.commands.get_latest_resume import handle_get_latest_resume_command
+            return handle_get_latest_resume_command(interaction_data)
         else:
             raise ValueError(f"Unknown command type: {command_type}")
 

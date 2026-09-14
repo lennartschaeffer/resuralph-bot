@@ -1,7 +1,7 @@
 import threading
 import logging
-from helpers.embed_helper import create_error_embed
-from helpers.sqs_publisher import create_deferred_response
+from apps.bot.src.helpers.embed_helper import create_error_embed
+from apps.bot.src.helpers.sqs_publisher import create_deferred_response
 
 logger = logging.getLogger(__name__)
 
@@ -16,20 +16,20 @@ def process_async_command_thread(interaction_data, command_type, application_id,
         
         # Process the command using the same logic as the Lambda processor
         if command_type == 'update':
-            from commands.update import handle_update_command
+            from apps.bot.src.commands.update import handle_update_command
             result_message = handle_update_command(interaction_data)
         elif command_type == 'ai_review':
-            from commands.ai_review import handle_ai_review_command
+            from apps.bot.src.commands.ai_review import handle_ai_review_command
             result_message = handle_ai_review_command(interaction_data)
         elif command_type == 'clear_resumes':
-            from commands.clear_resumes import handle_clear_resumes_command
+            from apps.bot.src.commands.clear_resumes import handle_clear_resumes_command
             result_message = handle_clear_resumes_command(interaction_data)
         else:
             logger.error(f"Unknown command type: {command_type}")
             result_message = f"Unknown command type: {command_type}"
         
         # Send follow-up message to Discord using the same helper as Lambda
-        from helpers.discord_followup import send_followup_message
+        from apps.bot.src.helpers.discord_followup import send_followup_message
         success = send_followup_message(application_id, interaction_token, result_message)
         
         if not success:
@@ -43,7 +43,7 @@ def process_async_command_thread(interaction_data, command_type, application_id,
         logger.error(f"Error in background thread processing {command_type}: {str(e)}")
         # Try to send error message
         try:
-            from helpers.discord_followup import send_followup_message
+            from apps.bot.src.helpers.discord_followup import send_followup_message
             error_context = "updating your resume" if command_type == 'update' else "analyzing your resume"
             error_msg = f"An error occurred while {error_context}. 😔"
             send_followup_message(application_id, interaction_token, error_msg)

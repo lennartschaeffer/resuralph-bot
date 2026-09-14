@@ -1,5 +1,5 @@
 import logging
-from helpers.embed_helper import create_info_embed
+from apps.bot.src.helpers.embed_helper import create_info_embed
 
 logger = logging.getLogger(__name__)
 

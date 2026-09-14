@@ -2,7 +2,7 @@ import requests
 import PyPDF2
 from io import BytesIO
 import logging
-from models.resume import DiscordAttachment
+from apps.bot.src.models.resume import DiscordAttachment
 
 
 logger = logging.getLogger(__name__)

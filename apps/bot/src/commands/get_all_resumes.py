@@ -1,7 +1,7 @@
 import os
 import logging
-from db.supabase_client import supabase_manager
-from helpers.embed_helper import create_error_embed, create_info_embed
+from apps.bot.src.db.supabase_client import supabase_manager
+from apps.bot.src.helpers.embed_helper import create_error_embed, create_info_embed
 
 logger = logging.getLogger(__name__)
 

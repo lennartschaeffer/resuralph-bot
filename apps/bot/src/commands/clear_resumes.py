@@ -1,7 +1,7 @@
 import logging
-from aws.s3 import delete_s3_resume
-from db.supabase_client import supabase_manager
-from helpers.embed_helper import create_success_embed, create_error_embed, create_info_embed, create_warning_embed
+from apps.bot.src.aws.s3 import delete_s3_resume
+from apps.bot.src.db.supabase_client import supabase_manager
+from apps.bot.src.helpers.embed_helper import create_success_embed, create_error_embed, create_info_embed, create_warning_embed
 
 logger = logging.getLogger(__name__)
 
