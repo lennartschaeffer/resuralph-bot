@@ -2,6 +2,7 @@ import json
 import logging
 from typing import Dict, Any, List
 from apps.bot.src.helpers.discord_followup import send_followup_message
+from apps.bot.src.command_dispatch import CommandType, run_async_command
 
 logging.basicConfig(
     level=logging.INFO,
@@ -85,23 +86,7 @@ def process_command(interaction_data: Dict[str, Any], command_type: str) -> Any:
         The result message to send back to Discord
     """
     try:
-        if command_type == 'update':
-            from apps.bot.src.commands.update import handle_update_command
-            return handle_update_command(interaction_data)
-        elif command_type == 'clear_resumes':
-            from apps.bot.src.commands.clear_resumes import handle_clear_resumes_command
-            return handle_clear_resumes_command(interaction_data)
-        elif command_type == 'get_all_resumes':
-            from apps.bot.src.commands.get_all_resumes import handle_get_all_resumes_command
-            return handle_get_all_resumes_command(interaction_data)
-        elif command_type == 'upload':
-            from apps.bot.src.commands.upload import handle_upload_command
-            return handle_upload_command(interaction_data)
-        elif command_type == 'get_latest_resume':
-            from apps.bot.src.commands.get_latest_resume import handle_get_latest_resume_command
-            return handle_get_latest_resume_command(interaction_data)
-        else:
-            raise ValueError(f"Unknown command type: {command_type}")
+        return run_async_command(CommandType(command_type), interaction_data)
 
     except Exception as e:
         logger.error(f"Error processing {command_type} command: {str(e)}")

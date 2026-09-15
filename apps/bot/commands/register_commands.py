@@ -5,8 +5,9 @@ import os
 dotenv.load_dotenv()
 
 
-TOKEN = os.getenv("BOT_TOKEN")
-APPLICATION_ID = os.getenv("APPLICATION_ID")
+IS_LOCAL = os.getenv("ENVIRONMENT", "DEV") != "PROD"
+TOKEN = os.getenv("DEV_BOT_TOKEN") if IS_LOCAL else os.getenv("BOT_TOKEN")
+APPLICATION_ID = os.getenv("DEV_APPLICATION_ID") if IS_LOCAL else os.getenv("APPLICATION_ID")
 URL = f"https://discord.com/api/v9/applications/{APPLICATION_ID}/commands"
 
 

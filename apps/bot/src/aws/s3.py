@@ -2,12 +2,14 @@ import os
 import boto3
 from datetime import datetime
 from botocore.exceptions import ClientError
+from apps.bot.src.helpers.environment import is_local_environment
 
 
 class S3Manager:
     def __init__(self):
         self.s3_client = boto3.client('s3')
         self.bucket_name = os.getenv('S3_BUCKET_NAME')
+        self.key_prefix = "dev/" if is_local_environment() else ""
 
     def save_s3_resume(self, file_buffer, user_id):
         """
@@ -23,7 +25,7 @@ class S3Manager:
         try:
             # Generate timestamp for unique filename
             timestamp = str(int(datetime.now().timestamp() * 1000))
-            s3_key = f"resumes/{user_id}/{timestamp}.pdf"
+            s3_key = f"{self.key_prefix}resumes/{user_id}/{timestamp}.pdf"
 
             # Upload file to S3 (private bucket, no public ACL)
             self.s3_client.put_object(
@@ -78,7 +80,7 @@ class S3Manager:
         """
         try:
             # List all objects with the user's prefix
-            prefix = f"resumes/{user_id}/"
+            prefix = f"{self.key_prefix}resumes/{user_id}/"
             
             response = self.s3_client.list_objects_v2(
                 Bucket=self.bucket_name,

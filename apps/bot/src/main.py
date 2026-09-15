@@ -12,6 +12,8 @@ from apps.bot.src.commands.ai_review import handle_ai_review_command
 from apps.bot.src.helpers.sqs_publisher import publish_command_to_queue, create_deferred_response
 from apps.bot.src.helpers.embed_helper import create_error_embed
 from apps.bot.src.helpers.local_async_processor import handle_async_command_local
+from apps.bot.src.helpers.environment import is_local_environment
+from apps.bot.src.command_dispatch import CommandType, ASYNC_COMMANDS
 
 logging.basicConfig(
     level=logging.INFO,
@@ -20,9 +22,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 load_dotenv()
-
-def is_local_environment():
-    return os.getenv("ENVIRONMENT", "DEV") != "PROD"
 
 DISCORD_PUBLIC_KEY = os.getenv("DEV_DISCORD_PUBLIC_KEY") if is_local_environment() else os.getenv("DISCORD_PUBLIC_KEY")
 
@@ -65,17 +64,24 @@ def interact(raw_request):
         })
 
 def handle_command_routing(command_name, raw_request):
-    
-    async_commands = set(["update", "clear_resumes", "get_all_resumes", "upload", "get_latest_resume"])
-    
+
     sync_command_handlers = {
-        "ai_review": handle_ai_review_command
+        CommandType.AI_REVIEW: handle_ai_review_command
     }
-    
-    if command_name in async_commands:
+
+    try:
+        command_type = CommandType(command_name)
+    except ValueError:
+        logger.warning(f"Unimplemented command: {command_name}")
+        return create_error_embed(
+            "Command Not Found",
+            f"Command '{command_name}' is not implemented yet."
+        )
+
+    if command_type in ASYNC_COMMANDS:
         if is_local_environment():
             # Local development: Use background thread for async processing
-            return handle_async_command_local(raw_request, command_name)
+            return handle_async_command_local(raw_request, command_type)
         else:
             # Production environment: Use SQS for async processing
             success = publish_command_to_queue(raw_request, command_name)
@@ -88,8 +94,8 @@ def handle_command_routing(command_name, raw_request):
                     "Processing Error",
                     "Failed to queue your request for processing. Please try again."
                 )
-    elif command_name in sync_command_handlers:
-        return sync_command_handlers[command_name](raw_request)
+    elif command_type in sync_command_handlers:
+        return sync_command_handlers[command_type](raw_request)
     else:
         logger.warning(f"Unimplemented command: {command_name}")
         return create_error_embed(
@@ -99,8 +105,7 @@ def handle_command_routing(command_name, raw_request):
 
 def format_command_response(command_name, response_content):
     # Async commands return deferred responses that are already formatted
-    async_commands = set(["update", "clear_resumes", "get_all_resumes", "upload", "get_latest_resume"])
-    if command_name in async_commands:
+    if command_name in ASYNC_COMMANDS:
         return response_content # deferred response already handled in async processing
 
     if isinstance(response_content, dict) and "embeds" in response_content:
