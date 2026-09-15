@@ -5,10 +5,6 @@ from mangum import Mangum
 from asgiref.wsgi import WsgiToAsgi
 from discord_interactions import verify_key_decorator
 from dotenv import load_dotenv
-from apps.bot.src.commands.upload import handle_upload_command
-from apps.bot.src.commands.get_latest_resume import handle_get_latest_resume_command
-from apps.bot.src.commands.get_all_resumes import handle_get_all_resumes_command
-from apps.bot.src.commands.ai_review import handle_ai_review_command
 from apps.bot.src.helpers.sqs_publisher import publish_command_to_queue, create_deferred_response
 from apps.bot.src.helpers.embed_helper import create_error_embed
 from apps.bot.src.helpers.local_async_processor import handle_async_command_local
@@ -65,10 +61,6 @@ def interact(raw_request):
 
 def handle_command_routing(command_name, raw_request):
 
-    sync_command_handlers = {
-        CommandType.AI_REVIEW: handle_ai_review_command
-    }
-
     try:
         command_type = CommandType(command_name)
     except ValueError:
@@ -78,30 +70,21 @@ def handle_command_routing(command_name, raw_request):
             f"Command '{command_name}' is not implemented yet."
         )
 
-    if command_type in ASYNC_COMMANDS:
-        if is_local_environment():
-            # Local development: Use background thread for async processing
-            return handle_async_command_local(raw_request, command_type)
-        else:
-            # Production environment: Use SQS for async processing
-            success = publish_command_to_queue(raw_request, command_name)
-            if success:
-                logger.info(f"Command '{command_name}' queued for async processing")
-                return create_deferred_response()
-            else:
-                logger.error(f"Failed to queue command '{command_name}'")
-                return create_error_embed(
-                    "Processing Error",
-                    "Failed to queue your request for processing. Please try again."
-                )
-    elif command_type in sync_command_handlers:
-        return sync_command_handlers[command_type](raw_request)
+    if is_local_environment():
+        # Local development: Use background thread for async processing
+        return handle_async_command_local(raw_request, command_type)
     else:
-        logger.warning(f"Unimplemented command: {command_name}")
-        return create_error_embed(
-            "Command Not Found",
-            f"Command '{command_name}' is not implemented yet."
-        )
+        # Production environment: Use SQS for async processing
+        success = publish_command_to_queue(raw_request, command_name)
+        if success:
+            logger.info(f"Command '{command_name}' queued for async processing")
+            return create_deferred_response()
+        else:
+            logger.error(f"Failed to queue command '{command_name}'")
+            return create_error_embed(
+                "Processing Error",
+                "Failed to queue your request for processing. Please try again."
+            )
 
 def format_command_response(command_name, response_content):
     # Async commands return deferred responses that are already formatted

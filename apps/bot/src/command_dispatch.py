@@ -7,7 +7,7 @@ class CommandType(str, Enum):
     GET_ALL_RESUMES = "get_all_resumes"
     UPLOAD = "upload"
     GET_LATEST_RESUME = "get_latest_resume"
-    AI_REVIEW = "ai_review"  # sync, not dispatched here — listed for completeness
+    AI_REVIEW = "ai_review"
 
 
 ASYNC_COMMANDS = {
@@ -16,6 +16,7 @@ ASYNC_COMMANDS = {
     CommandType.GET_ALL_RESUMES,
     CommandType.UPLOAD,
     CommandType.GET_LATEST_RESUME,
+    CommandType.AI_REVIEW,
 }
 
 
@@ -35,5 +36,8 @@ def run_async_command(command_type: CommandType, interaction_data):
     elif command_type == CommandType.GET_LATEST_RESUME:
         from apps.bot.src.commands.get_latest_resume import handle_get_latest_resume_command
         return handle_get_latest_resume_command(interaction_data)
+    elif command_type == CommandType.AI_REVIEW:
+        from apps.bot.src.commands.ai_review import handle_ai_review_command
+        return handle_ai_review_command(interaction_data)
     else:
         raise ValueError(f"Unknown command type: {command_type}")
