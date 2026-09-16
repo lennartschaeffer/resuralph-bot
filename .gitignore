@@ -23,6 +23,7 @@ __pycache__/
 # ---- Platform (Next.js) ----
 # dependencies
 node_modules
+.next
 /.pnp
 .pnp.*
 .yarn/*
@@ -30,6 +31,7 @@ node_modules
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+
 
 # testing
 /coverage
@@ -59,7 +61,7 @@ plans/
 plan.md
 CLAUDE.md
 
-/lib/generated/prisma
+**/lib/generated/prisma
 
 # Prisma
 prisma/*.db

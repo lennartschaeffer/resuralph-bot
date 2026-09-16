@@ -2,6 +2,8 @@ import requests
 import yaml
 import dotenv
 import os
+import time
+
 dotenv.load_dotenv()
 
 
@@ -23,3 +25,4 @@ for command in commands:
     print(response.json())
     command_name = command["name"]
     print(f"Command {command_name} created: {response.status_code}")
+    time.sleep(4) # be nice to api

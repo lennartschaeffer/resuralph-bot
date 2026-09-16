@@ -21,6 +21,9 @@ load_dotenv()
 
 DISCORD_PUBLIC_KEY = os.getenv("DEV_DISCORD_PUBLIC_KEY") if is_local_environment() else os.getenv("DISCORD_PUBLIC_KEY")
 
+if is_local_environment():
+    logger.info("running in dev mode!")
+
 app = Flask(__name__)
 asgi_app = WsgiToAsgi(app)
 handler = Mangum(asgi_app, lifespan="off")
