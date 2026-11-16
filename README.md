@@ -13,7 +13,7 @@ In today's competitive tech job market, a standout resume is the first step towa
 
 ## **Demo** 🎬
 
-[![ResuRalph Demo](./thumbnail.png)](https://youtu.be/CdxEOXKs7D8)
+[![ResuRalph Demo](apps/thumbnail.png)](https://youtu.be/CdxEOXKs7D8)
 
 ## **The Flow** ⏳
 
